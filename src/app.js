@@ -1,10 +1,12 @@
 const express = require('express');
 const path = require('path');
+const mongoose = require('mongoose');
 
 
 const port = 5000;
 
 const publicDir = path.join(__dirname,'../public');
+const viewsPath = path.join(__dirname, '../views');
 
 
 // init app
@@ -15,7 +17,14 @@ app.use(express.static(publicDir));
 
 // view engine setup
 app.set('view engine', 'ejs');
+app.set('views', viewsPath);
+
+app.get('/', (req, res) => {
+    res.render('index', {
+        title: 'Home'
+    });
+})
 
 app.listen(port, () => {
-    console.log(`Server is up at port ${port}`)
+    console.log(`Server is up at port ${port}`);
 });
