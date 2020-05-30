@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
-const mongoose = require('mongoose');
+require('./db/mongoose');
+const pagesRouter = require('./routes/pages');
+const adminRouter = require('./routes/admin_pages');
 
 
 const port = 5000;
@@ -19,11 +21,9 @@ app.use(express.static(publicDir));
 app.set('view engine', 'ejs');
 app.set('views', viewsPath);
 
-app.get('/', (req, res) => {
-    res.render('index', {
-        title: 'Home'
-    });
-})
+// set routes
+app.use('/admin/pages', adminRouter);
+app.use('/', pagesRouter);
 
 app.listen(port, () => {
     console.log(`Server is up at port ${port}`);
