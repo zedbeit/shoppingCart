@@ -15,6 +15,13 @@ const viewsPath = path.join(__dirname, '../views');
 // init app
 const app = express();
 
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
+// parse application/json
+app.use(bodyParser.json());
+
+app.use(express.json());
+
 // public folder setup
 app.use(express.static(publicDir));
 
@@ -25,13 +32,6 @@ app.set('views', viewsPath);
 // routes setup 
 app.use('/admin/pages', adminRouter);
 app.use('/', pagesRouter);
-
-// Body-parser middleware
-// 
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
-// parse application/json
-app.use(bodyParser.json());
 
 // Express-session middleware
 // 
