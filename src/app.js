@@ -15,6 +15,8 @@ const viewsPath = path.join(__dirname, '../views');
 // init app
 const app = express();
 
+app.locals.errors = null;
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 // parse application/json

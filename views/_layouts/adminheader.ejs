@@ -24,3 +24,11 @@
     </nav>
 
     <div class="container">
+
+    <% if(errors) { %>
+        <% errors.forEach(function(error) { %>
+            <div class="alert alert-danger mt-3">
+                <%= error.msg %>
+            </div>
+        <% }); %> 
+    <% } %>    
