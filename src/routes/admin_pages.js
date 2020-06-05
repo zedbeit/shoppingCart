@@ -4,14 +4,20 @@ const Page = require('../models/pages');
 
 const router = express.Router();
 
-// get all pages
-router.get('/', (req, res) => { // */* =>  */admin/pages*
-    res.send('Admin Area');
+// Get pages index
+router.get('/', async (req, res) => { // */* =>  */admin/pages
+    Page.find({}).sort({sorting: 1}).exec(function(err, pages) {    
+        // res.send(pages);
+        res.render('admin/pages', {
+            pages
+        });
+    });
+    // res.send('Admin Area');
 });
 
 // add page
 router.get('/add-page', (req, res) => { // */* =>  */admin/pages*
-    
+
     const title = '';
     const slug = '';
     const content = '';
@@ -87,7 +93,8 @@ router.post('/add-page', [
         const page = new Page({
             title,
             slug,
-            content
+            content,
+            sorting: 100
         });
 
         await page.save();
