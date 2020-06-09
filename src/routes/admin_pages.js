@@ -6,12 +6,25 @@ const router = express.Router();
 
 // Get pages index
 router.get('/', async (req, res) => { // */* =>  */admin/pages
-    Page.find({}).sort({sorting: 1}).exec(function(err, pages) {    
-        // res.send(pages);
+    // Page.find({}).sort({sorting: 1}).exec(function(err, pages) {    
+    //     // res.send(pages);
+    //     res.render('admin/pages', {
+    //         pages
+    //     });
+    // });
+
+    try {
+        const pages = await Page.find({}).sort({sorting: 1});
+
         res.render('admin/pages', {
             pages
         });
-    });
+
+    } catch (e) {
+        res.send('Pages not found!');
+    }
+    
+
     // res.send('Admin Area');
 });
 
@@ -52,32 +65,6 @@ router.post('/add-page', [
         });
     }
 
-    // Page.findOne({slug}, (err, page) => {
-    //     if (page) {
-    //         return res.render('admin/add_page', {
-    //             errors: [{msg: 'Page or Slug already exists!'}],
-    //             title,
-    //             slug,
-    //             content
-    //         });
-    //     }
-
-    //     page = new Page({
-    //         title,
-    //         slug,
-    //         content,
-    //         sorting: 0
-    //     });
-        
-    //     page.save((err) => {
-    //         if(err) {
-    //             return res.send('Page could not be saved!');
-    //         }
-    //         res.redirect('/admin/pages');
-    //     });
-
-    // })
-
     try {
         const slugExist = await Page.findOne({slug});
 
@@ -100,24 +87,32 @@ router.post('/add-page', [
         await page.save();
         
         res.redirect('/admin/pages');
-
-
     } catch (e) {
         // return res.status(400).send(e);
         return res.send('Page could not be saved!');
     }
-    
-
-    // const page = await Page.findOne({slug})
-    
-    // if (page) {
-
-    // }
-    
-
-
-    // res.send('Success!');
-
 });
 
+// GET edit page
+router.get('/edit-page/:slug', async (req, res) => {
+
+    try {
+        const page = await Page.findOne({slug: req.params.slug});
+
+        res.render('admin/edit_page', {
+            title: page.title,
+            slug: page.slug,
+            content: page.content,
+            id: page._id 
+        });
+    } catch (e) {
+        
+    }
+    
+    
+    
+    res.render('edit_page', {
+
+    })
+});
 module.exports = router;
