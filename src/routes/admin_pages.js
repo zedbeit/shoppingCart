@@ -139,6 +139,7 @@ router.post('/edit-page/:slug', [
         }
         
         const page = await Page.findById(id);
+        // const user = await User.findByIdAndUpdate(id, req.body, { new: true, runValidators: true })
 
         page.title = title;
         page.slug = slug;
@@ -150,6 +151,21 @@ router.post('/edit-page/:slug', [
     } catch (e) {
         // return res.status(400).send(e);
         return res.send('Page could not be edited!');
+    }
+});
+
+router.get('/delete-page/:id', async (req, res) => {
+    try {
+        const page = await Page.findByIdAndDelete(req.params.id);
+        console.log(page);
+        
+        if (!page) {
+            return res.status(404).send('Error')
+        }
+
+        res.redirect('/admin/pages/');
+    } catch (e) {
+        res.status(500).send()
     }
 });
 
