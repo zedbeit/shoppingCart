@@ -6,13 +6,6 @@ const router = express.Router();
 
 // Get pages index
 router.get('/', async (req, res) => { // */* =>  */admin/pages
-    // Page.find({}).sort({sorting: 1}).exec(function(err, pages) {    
-    //     // res.send(pages);
-    //     res.render('admin/pages', {
-    //         pages
-    //     });
-    // });
-
     try {
         const pages = await Page.find({}).sort({sorting: 1});
 
@@ -76,16 +69,13 @@ router.post('/add-page', [
                 content
             });
         }
-
         const page = new Page({
             title,
             slug,
             content,
             sorting: 100
         });
-
         await page.save();
-        
         res.redirect('/admin/pages');
     } catch (e) {
         // return res.status(400).send(e);
@@ -95,7 +85,6 @@ router.post('/add-page', [
 
 // GET edit page
 router.get('/edit-page/:slug', async (req, res) => {
-
     try {
         const page = await Page.findOne({slug: req.params.slug});
 
@@ -106,13 +95,62 @@ router.get('/edit-page/:slug', async (req, res) => {
             id: page._id 
         });
     } catch (e) {
-        
-    }
-    
-    
-    
-    res.render('edit_page', {
-
-    })
+        res.send('Error: Couldn\'t edit page');    
+    }    
 });
+
+// POST edit page
+router.post('/edit-page/:slug', [
+    check('title', 'Title value is empty')
+        .not().isEmpty(),
+    check('content', 'Content must not be empty')
+        .not().isEmpty()
+], async (req, res) => {
+
+    const title = req.body.title;
+    const slug = req.body.slug === '' ? title.replace(/\s+/g, '-').toLowerCase(): req.body.slug.replace(/\s+/g, '-').toLowerCase();
+    const content = req.body.content;
+    const id = req.body.id;
+
+    const errors = validationResult(req);
+    
+    if(!errors.isEmpty()) {
+        // return res.status(422).json({ errors: errors.array() });    
+        return res.render('admin/edit_page', {
+            errors: errors.array(),
+            title,
+            slug,
+            content,
+            id
+        });
+    }
+
+    try {
+        const slugExist = await Page.findOne({slug, _id:{'$ne': id}});
+
+        if(slugExist) {
+            return res.render('admin/edit_page', {
+                errors: [{msg: 'Page or Slug already exists!'}],
+                title,
+                slug,
+                content,
+                id
+            });
+        }
+        
+        const page = await Page.findById(id);
+
+        page.title = title;
+        page.slug = slug;
+        page.content = content;
+
+        await page.save();
+
+        res.redirect('/admin/pages/edit-page/'+ page.slug);
+    } catch (e) {
+        // return res.status(400).send(e);
+        return res.send('Page could not be edited!');
+    }
+});
+
 module.exports = router;
