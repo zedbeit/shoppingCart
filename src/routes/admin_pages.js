@@ -84,9 +84,9 @@ router.post('/add-page', [
 });
 
 // GET edit page
-router.get('/edit-page/:slug', async (req, res) => {
+router.get('/edit-page/:id', async (req, res) => {
     try {
-        const page = await Page.findOne({slug: req.params.slug});
+        const page = await Page.findById(req.params.id);
 
         res.render('admin/edit_page', {
             title: page.title,
@@ -101,7 +101,7 @@ router.get('/edit-page/:slug', async (req, res) => {
 });
 
 // POST edit page
-router.post('/edit-page/:slug', [
+router.post('/edit-page/:id', [
     check('title', 'Title value is empty')
         .not().isEmpty(),
     check('content', 'Content must not be empty')
@@ -148,7 +148,7 @@ router.post('/edit-page/:slug', [
 
         await page.save();
 
-        res.redirect('/admin/pages/edit-page/'+ page.slug);
+        res.redirect('/admin/pages/edit-page/'+ page._id);
     } catch (e) {
         // return res.status(400).send(e);
         return res.send('Page could not be edited!');
