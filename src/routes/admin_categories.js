@@ -1,24 +1,21 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
-const Page = require('../models/pages');
+const Category = require('../models/category');
 
 const router = express.Router();
 
 // Get pages index
 router.get('/', async (req, res) => { // */* =>  */admin/pages
     try {
-        const pages = await Page.find({}).sort({sorting: 1});
+        const categories = await    Category.find({});
 
-        res.render('admin/pages', {
-            pages
+        res.render('admin/categories', {
+            categories
         });
 
     } catch (e) {
-        res.send('Pages not found!');
+        res.send('Categories not found!');
     }
-    
-
-    // res.send('Admin Area');
 });
 
 // add page
