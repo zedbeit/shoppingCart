@@ -91,7 +91,7 @@ router.post('/edit-category/:id', [
     const title = req.body.title;
     const slug = title.replace(/\s+/g, '-').toLowerCase();
     const id = req.params.id;
-    
+
     const errors = validationResult(req);
     
     if(!errors.isEmpty()) {
@@ -126,15 +126,15 @@ router.post('/edit-category/:id', [
     }
 });
 
-router.get('/delete-page/:id', async (req, res) => {
+router.get('/delete-category/:id', async (req, res) => {
     try {
-        const page = await Page.findByIdAndDelete(req.params.id);
+        const category = await Category.findByIdAndDelete(req.params.id);
     
-        if (!page) {
-            return res.status(404).send('Error')
+        if (!category) {
+            return res.status(404).send('Error');
         }
 
-        res.redirect('/admin/pages/');
+        res.redirect('/admin/categories/');
     } catch (e) {
         res.status(500).send()
     }
