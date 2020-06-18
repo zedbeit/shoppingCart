@@ -4,10 +4,10 @@ const Category = require('../models/category');
 
 const router = express.Router();
 
-// Get pages index
-router.get('/', async (req, res) => { // */* =>  */admin/pages
+// GET pages index
+router.get('/', async (req, res) => { // */* =>  */admin/categories
     try {
-        const categories = await    Category.find({});
+        const categories = await Category.find({});
 
         res.render('admin/categories', {
             categories
@@ -18,149 +18,123 @@ router.get('/', async (req, res) => { // */* =>  */admin/pages
     }
 });
 
-// add page
-router.get('/add-page', (req, res) => { // */* =>  */admin/pages*
-
+// GET add page
+router.get('/add-category', (req, res) => { // */* =>  */admin/categories*
     const title = '';
-    const slug = '';
-    const content = '';
-
-    res.render('admin/add_page', {
-        title,
-        slug,
-        content
+    res.render('admin/add_category', {
+        title
     });
 });
 
-router.post('/add-page', [
+// POST add page
+router.post('/add-category', [
     check('title', 'Title value is empty')
-        .not().isEmpty(),
-    check('content', 'Content must not be empty')
         .not().isEmpty()
 ], async (req, res) => {
-
     const title = req.body.title;
-    const slug = req.body.slug === '' ? title.replace(/\s+/g, '-').toLowerCase(): req.body.slug.replace(/\s+/g, '-').toLowerCase();
-    const content = req.body.content;
+    const slug = title.replace(/\s+/g, '-').toLowerCase();
     
     const errors = validationResult(req);
     
     if(!errors.isEmpty()) {
         // return res.status(422).json({ errors: errors.array() });    
-        return res.render('admin/add_page', {
+        return res.render('admin/add_category', {
             errors: errors.array(),
-            title,
-            slug,
-            content
+            title
         });
     }
 
     try {
-        const slugExist = await Page.findOne({slug});
+        const slugExist = await Category.findOne({slug});
 
         if(slugExist) {
-            return res.render('admin/add_page', {
-                errors: [{msg: 'Page or Slug already exists!'}],
-                title,
-                slug,
-                content
+            return res.render('admin/add_category', {
+                errors: [{msg: 'Category already exists!'}],
+                title
             });
         }
-        const page = new Page({
+        const category = new Category({
             title,
-            slug,
-            content,
-            sorting: 100
+            slug
         });
-        await page.save();
-        res.redirect('/admin/pages');
+        
+        await category.save();
+        res.redirect('/admin/categories');
     } catch (e) {
         // return res.status(400).send(e);
-        return res.send('Page could not be saved!');
+        return res.send('Categories could not be saved!');
     }
 });
 
 // GET edit page
-router.get('/edit-page/:slug', async (req, res) => {
+router.get('/edit-category/:id', async (req, res) => {
     try {
-        const page = await Page.findOne({slug: req.params.slug});
+        const category = await Category.findById(req.params.id);
 
-        res.render('admin/edit_page', {
-            title: page.title,
-            slug: page.slug,
-            content: page.content,
-            id: page._id 
+        const id = category._id;
+        
+        res.render('admin/edit_category', {
+            title: category.title,
+            id 
         });
         
     } catch (e) {
-        res.send('Error: Couldn\'t edit page');    
+        res.send('Error: Couldn\'t edit category');    
     }    
 });
 
 // POST edit page
-router.post('/edit-page/:slug', [
+router.post('/edit-category/:id', [
     check('title', 'Title value is empty')
-        .not().isEmpty(),
-    check('content', 'Content must not be empty')
         .not().isEmpty()
 ], async (req, res) => {
-
     const title = req.body.title;
-    const slug = req.body.slug === '' ? title.replace(/\s+/g, '-').toLowerCase(): req.body.slug.replace(/\s+/g, '-').toLowerCase();
-    const content = req.body.content;
-    const id = req.body.id;
+    const slug = title.replace(/\s+/g, '-').toLowerCase();
+    const id = req.params.id;
 
     const errors = validationResult(req);
     
     if(!errors.isEmpty()) {
         // return res.status(422).json({ errors: errors.array() });    
-        return res.render('admin/edit_page', {
+        return res.render('admin/edit_category', {
             errors: errors.array(),
             title,
-            slug,
-            content,
             id
         });
     }
 
     try {
-        const slugExist = await Page.findOne({slug, _id:{'$ne': id}});
+        const slugExist = await Category.findOne({slug, _id:{'$ne': id}});
 
         if(slugExist) {
-            return res.render('admin/edit_page', {
-                errors: [{msg: 'Page or Slug already exists!'}],
+            return res.render('admin/edit_category', {
+                errors: [{msg: 'Category already exists!'}],
                 title,
-                slug,
-                content,
                 id
             });
         }
         
-        const page = await Page.findById(id);
+        const category = await Category.findById(id);
         // const user = await User.findByIdAndUpdate(id, req.body, { new: true, runValidators: true })
-
-        page.title = title;
-        page.slug = slug;
-        page.content = content;
-
-        await page.save();
-
-        res.redirect('/admin/pages/edit-page/'+ page.slug);
+        category.title = title;
+        category.slug = slug;
+        await category.save();
+        res.redirect('/admin/categories/edit-category/'+ id);
     } catch (e) {
         // return res.status(400).send(e);
-        return res.send('Page could not be edited!');
+        return res.send('Category could not be edited!');
     }
 });
 
-router.get('/delete-page/:id', async (req, res) => {
+router.get('/delete-category/:id', async (req, res) => {
     try {
-        const page = await Page.findByIdAndDelete(req.params.id);
+        const category = await Category.findByIdAndDelete(req.params.id);
     
-        if (!page) {
-            return res.status(404).send('Error')
+        if (!category) {
+            return res.status(404).send('Error');
         }
 
-        res.redirect('/admin/pages/');
+        res.redirect('/admin/categories/');
     } catch (e) {
         res.status(500).send()
     }
