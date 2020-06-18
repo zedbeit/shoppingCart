@@ -1,10 +1,11 @@
 const express = require('express');
 const path = require('path');
 require('./db/mongoose');
-const pagesRouter = require('./routes/pages');
-const adminRouter = require('./routes/admin_pages');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const pagesRouter = require('./routes/pages');
+const adminRouter = require('./routes/admin_pages');
+const categoriesRouter = require('./routes/admin_categories');
 
 const port = 5000;
 
@@ -33,6 +34,7 @@ app.set('views', viewsPath);
 
 // routes setup 
 app.use('/admin/pages', adminRouter);
+app.use('/admin/categories', categoriesRouter);
 app.use('/', pagesRouter);
 
 // Express-session middleware
