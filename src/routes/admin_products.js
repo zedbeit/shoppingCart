@@ -8,18 +8,24 @@ const router = express.Router();
 
 // Product model
 const Product = require('../models/product');
+// Category model
+const Category = require('../models/category');
 
 // GET product index
-router.get('/', async (req, res) => { // */* =>  */admin/categories
+router.get('/', async (req, res) => { // */* =>  */admin/products
     try {
-        const categories = await Category.find({});
+        // let count = 0;
+        const count = await Product.countDocuments({});
 
-        res.render('admin/categories', {
-            categories
+        const products = await Product.find({});
+
+        res.render('admin/products', {
+            products,
+            count
         });
 
     } catch (e) {
-        res.send('Categories not found!');
+        res.send('Products not found!');
     }
 });
 
